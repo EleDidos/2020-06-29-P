@@ -2,7 +2,7 @@ package it.polito.tdp.PremierLeague.model;
 
 import java.time.LocalDateTime;
 
-public class Match {
+public class Match  {
 	Integer matchID;
 	Integer teamHomeID;
 	Integer teamAwayID;

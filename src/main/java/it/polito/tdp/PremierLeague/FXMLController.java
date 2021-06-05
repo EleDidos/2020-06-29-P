@@ -8,6 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.PremierLeague.model.Arco;
+import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,13 +42,13 @@ public class FXMLController {
     private TextField txtMinuti; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMese"
-    private ComboBox<?> cmbMese; // Value injected by FXMLLoader
+    private ComboBox<String> cmbMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM1"
-    private ComboBox<?> cmbM1; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM1; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM2"
-    private ComboBox<?> cmbM2; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM2; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -53,16 +56,112 @@ public class FXMLController {
     @FXML
     void doConnessioneMassima(ActionEvent event) {
     	
+    	if(model.getGraph()==null) {
+    		txtResult.setText("Crea prima il grafo");
+    		return;
+    	}
+    	
+    	txtResult.appendText("Le coppie con la massima connessione sono:\n");
+    	for(Arco a : model.getArchiMax())
+    		txtResult.appendText(a.toString()+"\n");
+    	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	txtResult.clear();
+    	String meseString;
+    	Integer mese=0;
+    	try {
+    		meseString=cmbMese.getValue();
+    	}catch(NullPointerException npe) {
+    		txtResult.appendText("Scegli un mese");
+    		return;
+    	}
+    	
+    	switch(meseString) {
+    		case "Gennaio":
+    			mese=1;
+    			break;
+    		case "Febbraio":
+    			mese=2;
+    			break;
+    		case "Marzo":
+    			mese=3;
+    			break;
+    		case "Aprile":
+    			mese=4;
+    			break;
+    		case "Maggio":
+    			mese=5;
+    			break;
+    		case "Giugno":
+    			mese=6;
+    			break;
+    		case "Luglio":
+    			mese=7;
+    			break;
+    		case "Agosto":
+    			mese=8;
+    			break;
+    		case "Settembre":
+    			mese=9;
+    			break;
+    		case "Ottobre":
+    			mese=10;
+    			break;
+    		case "Novembre":
+    			mese=11;
+    			break;
+    		case "Dicembre":
+    			mese=12;
+    			break;
+    		default:
+    			mese=0;
+    			break;
+    	}
+    	
+    	Integer MIN;
+    	try {
+    		MIN=Integer.parseInt(txtMinuti.getText()) ;
+    	}catch(NumberFormatException nfe) {
+    		txtResult.appendText("Inserisci un numero intero di minuti");
+    		return;
+    	}
+    	catch(NullPointerException npe) {
+    		txtResult.appendText("Inserisci un numero intero di minuti");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(mese,MIN);
+    	
+    	txtResult.appendText("Caratteristiche del GRAFO:\n#VERTICI = "+this.model.getNVertici()+"\n#ARCHI = "+this.model.getNArchi()+"\n");
+    	
+    	cmbM1.getItems().addAll(model.getVertici());
+    	cmbM2.getItems().addAll(model.getVertici());
     	
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
-    	
+    	if(this.model.getGraph()==null) {
+    		txtResult.setText("Crea prima il grafo");
+    		return;
+    	}
+    		
+    	Match m1;
+    	Match m2;
+    	try {
+    		m1=cmbM1.getValue();
+    		m2=cmbM2.getValue();
+    	}catch(NullPointerException npe) {
+    		txtResult.appendText("Scegli due matches");
+    		return;
+    	}
+    	List <Arco> best= model.trovaPercorso(m1,m2);
+    	txtResult.appendText("Il percorso tra i 2 match scelti con peso maggiore è:\n");
+    	for(Arco a: best)
+    		txtResult.appendText(a.toString()+"\n");
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -79,6 +178,9 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	String[] mesi = {"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
+    	
+    	cmbMese.getItems().addAll(mesi);
   
     }
     
