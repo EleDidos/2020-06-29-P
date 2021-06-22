@@ -55,15 +55,11 @@ public class FXMLController {
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
-    	
-    	if(model.getGraph()==null) {
-    		txtResult.setText("Crea prima il grafo");
-    		return;
-    	}
-    	
-    	txtResult.appendText("Le coppie con la massima connessione sono:\n");
-    	for(Arco a : model.getArchiMax())
-    		txtResult.appendText(a.toString()+"\n");
+    	if(model.getGraph()==null)
+    		txtResult.setText("Devi prima creare il grafo");
+    	txtResult.appendText("\nLe coppie di match con peso MAX sono:\n");
+    	txtResult.appendText(model.getCoppieTOP());
+    
     	
     }
 
@@ -74,6 +70,10 @@ public class FXMLController {
     	Integer mese=0;
     	try {
     		meseString=cmbMese.getValue();
+    		if(meseString==null) {
+    			txtResult.setText("Scegli un mese");
+    			return;
+    		}
     	}catch(NullPointerException npe) {
     		txtResult.appendText("Scegli un mese");
     		return;
@@ -144,24 +144,25 @@ public class FXMLController {
 
     @FXML
     void doCollegamento(ActionEvent event) {
-    	if(this.model.getGraph()==null) {
-    		txtResult.setText("Crea prima il grafo");
-    		return;
-    	}
-    		
-    	Match m1;
-    	Match m2;
+    	if(model.getGraph()==null)
+    		txtResult.setText("Devi prima creare il grafo");
+    	
+    	Match partenza;
+    	Match arrivo;
     	try {
-    		m1=cmbM1.getValue();
-    		m2=cmbM2.getValue();
-    	}catch(NullPointerException npe) {
-    		txtResult.appendText("Scegli due matches");
+    		partenza= cmbM1.getValue();
+    		arrivo=cmbM2.getValue();
+    	}
+    	catch(NullPointerException npe) {
+    		txtResult.appendText("Scegli un match di partenza e uno di arrivo");
     		return;
     	}
-    	List <Arco> best= model.trovaPercorso(m1,m2);
-    	txtResult.appendText("Il percorso tra i 2 match scelti con peso maggiore è:\n");
-    	for(Arco a: best)
-    		txtResult.appendText(a.toString()+"\n");
+    	
+    	List <Match> percorsoTOP = model.trovaPercorso(partenza, arrivo);
+    	txtResult.appendText("\nIl percorso di peso MAX è:\n");
+    	for(Match m: percorsoTOP)
+    		txtResult.appendText(m+"\n");
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
